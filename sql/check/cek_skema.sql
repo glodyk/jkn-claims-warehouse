@@ -1,0 +1,3 @@
+SELECT schema_name
+FROM INFORMATION_SCHEMA.SCHEMATA
+ORDER BY schema_name;

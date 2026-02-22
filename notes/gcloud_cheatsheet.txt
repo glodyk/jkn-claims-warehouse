@@ -1,0 +1,88 @@
+-- Cek koneksi dulu (WAJIB tiap buka laptop)
+gcloud auth list
+gcloud config list project
+kalau belum benar:
+gcloud config set project NAMA_PROJECT_KAMU
+
+-- Google Cloud Storage (GCS) — kelola file seperti “harddisk cloud” Pakai gsutil
+
+gsutil ls -- melihat bucket
+gsutil ls gs://nama-bucket -- melihat isi bucket
+gsutil ls gs://nama-bucket/raw/ -- masuk folder
+
+-- Upload file ke cloud
+gsutil cp data.csv gs://nama-bucket/raw/ -- upload file
+gsutil -m cp -r raw/ gs://nama-bucket/   -- upload folder
+
+-- Download dari cloud
+gsutil cp gs://nama-bucket/raw/data.csv .
+
+-- Rename file (GCS tidak punya rename → sebenarnya MOVE)
+gsutil mv gs://nama-bucket/raw/data.csv gs://nama-bucket/raw/data_2020.csv
+
+-- Move file ke folder lain
+gsutil mv gs://nama-bucket/raw/data.csv gs://nama-bucket/staging/
+
+gsutil rm gs://nama-bucket/raw/data.csv -- hapus file
+gsutil -m rm -r gs://nama-bucket/raw/   -- hapus folder
+
+-- BigQuery (inti kerja Data Engineer)
+bq ls -- melihat dataset
+bq ls nama_dataset -- melihat tabel dalam dataset
+bq show staging.kunjungan   -- melihat struktur tabel
+
+-- RUN QUERY (INI PALING PENTING)
+bq query --use_legacy_sql=false '
+SELECT COUNT(*) FROM `project.dataset.tabel`
+`
+bq query --use_legacy_sql=false '
+SELECT COUNT(*) FROM `bpjs-analytics.staging.raw_kunjungan`
+'
+-- RUN QUERY dari file SQL ⭐ (ini nanti kamu pakai tiap hari)
+sql/cohort.sql -- simpan query di:
+bq query --use_legacy_sql=false < sql/cohort.sql -- lalu jalankan
+
+-- Create Table dari Cloud Storage
+
+-- CSV:
+bq load --autodetect --source_format=CSV staging.kunjungan \
+gs://nama-bucket/raw/kunjungan.csv
+
+-- Parquet (PALING BAGUS):
+bq load --source_format=PARQUET staging.kunjungan \
+gs://nama-bucket/raw/kunjungan.parquet
+
+-- Export tabel BigQuery ke Cloud Storage
+-- (ini penting buat backup / bawa ke R / Python)
+bq extract \
+--destination_format=CSV \
+staging.kunjungan \
+gs://nama-bucket/output/kunjungan.csv
+
+-- Delete tabel
+bq rm -t staging.kunjungan
+bq rm -f -t staging.kunjungan -- tanpa konfirmasi
+
+-- Rename tabel
+(BigQuery tidak punya rename → caranya copy + delete)
+bq cp staging.kunjungan staging.kunjungan_baru
+bq rm -t staging.kunjungan
+
+-- Copy tabel (super sering dipakai di data warehouse)
+bq cp staging.kunjungan mart.kunjungan -- ini sebenarnya = publish ke mart layer
+
+-- Jalankan Scheduled ETL manual (konsep penting)
+workflow: RAW (GCS) → STAGING (BQ) → MART (BQ) → Tableau/R
+1. upload file:
+gsutil cp file.parquet gs://bpjs-analytics/raw/
+2. load ke staging:
+bq load --source_format=PARQUET staging.kunjungan gs://bpjs-analytics/raw/file.parquet
+3. transform (SQL):
+bq query --use_legacy_sql=false < sql/build_mart.sql
+-- SELESAI
+Tips paling penting: Jangan lagi nulis query di UI BigQuery.
+
+bq --location=asia-southeast2 query --use_legacy_sql=false < sql/01_staging/stg_nonkapitasi0.sql
+bq --location=asia-southeast2 query --use_legacy_sql=false < sql\01_staging\stg_nonkapitasi1.sql
+
+

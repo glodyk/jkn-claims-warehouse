@@ -1,0 +1,81 @@
+bq query --use_legacy_sql=false < sql/01_staging/stg_inacbgs.sql
+
+-- TUGAS HARI INI, merapihkan klaim pending
+-- download koreksi klaim
+-- download history klaim
+-- flaging iterasi -> cari obatnya -> cari potensi di masing2 rumah sakit
+-- 560 - Transurethral removal of obstruction from ureter and renal pelvis
+-- rujukan spesialis antar poli > episode rawat jalan
+-- Z511 kemoterapi
+
+Tingkat Utilisasi
+Rate Rujukan 14,05 ‰, Rate RJTL 52,85 ‰, Rate RITL 7,18 ‰, UC RJTL Rp329.989,- UC RITL Rp5.142.928,- Jumlah rujukan 40.307.920,
+Realisasi Belanja Manfaat
+Realisasi Belanja Manfaat Terhadap Perencanaan ≤ 100% dari alokasi 2025
+Penyelesaian Klaim Bermasalah
+(Pending & Dispute)
+100% dari target 2025
+Efisiensi Biaya
+Nasional >5,08Triliun rupiah
+Efektivitas Pencegahan Fraud
+100% terhadap target 2025
+Efektivitas Deteksi Fraud
+100% terhadap target 2025
+Maturitas Klaim
+100% dari target 2025
+GOALS
+KENDALI BIAYA
+
+gcloud --version
+bq ls
+
+Get-Content .\sql\01_staging\stg_inacbgs.sql -Raw | bq query --use_legacy_sql=false
+
+bq rm -f -t bpjs-kediri:staging_inacbgs.inacbgs_stg
+
+SELECT nmtindakan
+FROM `bpjs-kediri.staging_nonkapitasi.non_kapitasi_stage2`
+WHERE klasifikasi_kunjungan = 'Rawat Jalan Umum'
+LIMIT 50;
+
+SELECT *
+FROM `bpjs-kediri.staging_nonkapitasi.non_kapitasi_stage2`
+WHERE klasifikasi_kunjungan = 'Prolanis'
+LIMIT 200;
+
+SELECT *
+FROM `bpjs-kediri.staging_nonkapitasi.non_kapitasi_stage2`
+WHERE nmtindakan IS NULL
+   OR TRIM(nmtindakan) = ''
+LIMIT 200;
+
+-- buat folder kosong
+gsutil cp nul gs://bpjs-kediri/raw/.keep
+gsutil cp nul gs://bpjs-kediri/reference/.keep
+gsutil cp nul gs://bpjs-kediri/processed/.keep
+
+-- pindah dari laptop ke gcloud
+gsutil -m mv gs://bpjs-kediri/inacbgs gs://bpjs-kediri/raw/
+gsutil -m mv gs://bpjs-kediri/kapitasi gs://bpjs-kediri/raw/
+gsutil -m mv gs://bpjs-kediri/non_kapitasi gs://bpjs-kediri/raw/
+gsutil -m mv gs://bpjs-kediri/obat gs://bpjs-kediri/raw/
+gsutil -m mv gs://bpjs-kediri/pintu_masuk gs://bpjs-kediri/raw/
+gsutil -m mv gs://bpjs-kediri/prolanis gs://bpjs-kediri/raw/
+gsutil -m mv gs://bpjs-kediri/pst_terdaftar gs://bpjs-kediri/raw/
+gsutil -m mv gs://bpjs-kediri/rujukan_fktp gs://bpjs-kediri/raw/
+gsutil -m mv gs://bpjs-kediri/valbiom gs://bpjs-kediri/raw/
+gsutil -m mv gs://bpjs-kediri/metafisik gs://bpjs-kediri/raw/
+gsutil -m mv gs://bpjs-kediri/dim_prb gs://bpjs-kediri/raw/
+
+gsutil ls -r gs://bpjs-kediri/koreksi_klaim
+
+gsutil rm -r gs://bpjs-kediri/valbiom
+
+
+gsutil ls gs://bpjs-kediri/
+
+bq --location=asia-southeast2 mk -d raw_dataset
+bq --location=asia-southeast2 mk -d staging_dataset
+bq --location=asia-southeast2 mk -d mart_dataset
+
+gsutil rm gs://bpjs-kediri/raw/rujukan_fktp/raw/.keep

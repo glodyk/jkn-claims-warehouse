@@ -1,0 +1,27 @@
+CREATE OR REPLACE TABLE `bpjs-kediri.mart.kunjungan` AS
+SELECT
+    nokapst,
+    nosjp,
+    tgldtgsjp AS tgldtgsjp,
+    tglplgsjp AS tglplgsjp,
+    nmdati2layan AS nmdati2layan,
+    nmtkp AS nmtkp,
+    kelashak AS kelashak,
+    jkpst AS jkpst,
+    umur AS umur,
+    nmppklayan AS nmppklayan,
+    politujsjp AS politujsjp,
+    kddiagprimer,
+    nmdiagprimer,
+    diagsekunder,
+    prosedure,
+    kdinacbgs,
+    nminacbgs,
+    klsrawat,
+    kelasrsmenkes,
+    namadpjp,
+    nmjnspulang,
+    biayars,
+    biayaverifikasi,
+    (biayars - biayaverifikasi) AS selisih_klaim
+FROM `bpjs-kediri.staging.inacbgs_stg`;
