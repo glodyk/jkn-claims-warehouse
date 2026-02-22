@@ -1,3 +1,15 @@
+-- Workflow setiap kali kamu mengubah SQL / notes / script
+1. masuk terminal VS Code
+C:\Users\Lenovo\Documents\bpjs-analytics
+2. Cek apa saja yang berubah:
+git status
+3. Tambahkan perubahan:
+git add .
+4. Simpan versi (commit) tombol SAVE PERMANEN
+git commit -m "update cohort logic and assumptions"
+5. Upload ke GitHub (PUSH)
+git push
+
 -- Cek koneksi dulu (WAJIB tiap buka laptop)
 gcloud auth list
 gcloud config list project
