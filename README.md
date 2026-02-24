@@ -169,3 +169,23 @@ Derived indicators:
 ```
 bq query --use_legacy_sql=false < sql/mart/mart_cohort.sql
 ```
+
+## Warehouse Tables
+
+### Staging Layer
+
+- [diagnosa](docs/staging_diagnosa.md)
+- [inacbgs_stg](docs/staging_inacbgs_stg.md)
+- [kunjungan](docs/staging_kunjungan.md)
+- [non_kapitasi_stg](docs/staging_non_kapitasi_stg.md)
+- [non_kapitasi_stg1](docs/staging_non_kapitasi_stg1.md)
+- [peserta](docs/staging_peserta.md)
+
+### Mart Layer
+
+- [chronic_risk_score](docs/mart_chronic_risk_score.md)
+- [diabetes_cohort](docs/mart_diabetes_cohort.md)
+- [kunjungan](docs/mart_kunjungan.md)
+- [last_visit](docs/mart_last_visit.md)
+
+<!-- TABLES_START -->

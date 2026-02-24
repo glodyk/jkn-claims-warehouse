@@ -21,6 +21,7 @@ SELECT
   STRING_AGG(DISTINCT nmdati2layan, ';') AS nmdati2layan,
   STRING_AGG(DISTINCT jenisppklayan, ';') AS jenisppklayan,
   STRING_AGG(DISTINCT typeppklayan, ';') AS typeppklayan,
+  STRING_AGG(DISTINCT kdppklayan, ';') AS kdppklayan,
   STRING_AGG(DISTINCT nmppklayan, ';') AS nmppklayan,
   STRING_AGG(DISTINCT kddiagnosa, ';') AS kddiagnosa,
   STRING_AGG(DISTINCT nmdiagnosa, ';') AS nmdiagnosa,
